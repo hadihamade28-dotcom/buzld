@@ -11,8 +11,10 @@ const GAP_ROUTES: Record<string, string> = {
   interests: '/profile/interests',
   lifestyle: '/profile/edit',
   flash: '/profile/edit',
+  looking_for: '/profile/edit',
   height: '/profile/edit',
   prompt: '/profile/edit',
+  style: '/profile/edit',
 };
 
 export function ProfileBoostPrompt() {

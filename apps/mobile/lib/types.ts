@@ -151,6 +151,7 @@ export const LOOKING_FOR_TAGS = [
   'beard',
   'tattoos',
   'glasses',
+  'athletic',
 ] as const;
 
 export const INTENT_OPTIONS: { id: Intent; label: string; hint: string }[] = [
@@ -178,6 +179,8 @@ export const PROFILE_GAP_COPY: Record<string, string> = {
   interests: 'Add interests — profiles with them get more relevant buzzes',
   lifestyle: 'Answer a few lifestyle cards — better lifestyle matches',
   flash: 'Do the “your type” round — seeds better visual matches',
+  looking_for: 'Add look prefs — we prioritize people who fit what you notice',
   height: 'Add your height — 2× more matches mention it',
   prompt: 'Add a prompt — people message more when there’s a hook',
+  style: 'Add your look style — helps the right people find you',
 };

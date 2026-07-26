@@ -112,20 +112,60 @@ export function physicalOverlapScore(
   bPrefs: PhysicalPrefs | null,
 ): number {
   if (!aPrefs || !bPrefs) return 0.3;
-  const aTags = new Set([...(aPrefs.style_tags ?? []), ...(aPrefs.looking_for_tags ?? [])]);
-  const bTags = [...(bPrefs.style_tags ?? []), ...(bPrefs.looking_for_tags ?? [])];
-  if (!aTags.size || !bTags.length) return 0.3;
-  const hit = bTags.filter((t) => aTags.has(t)).length;
-  return Math.min(1, hit / Math.max(3, Math.min(aTags.size, bTags.length)));
+  const outboundWant = aPrefs.looking_for_tags ?? [];
+  const outboundHave = [...(bPrefs.style_tags ?? []), ...(bPrefs.looking_for_tags ?? [])];
+  const inboundWant = bPrefs.looking_for_tags ?? [];
+  const inboundHave = [...(aPrefs.style_tags ?? []), ...(aPrefs.looking_for_tags ?? [])];
+
+  const scores: number[] = [];
+  if (outboundWant.length && outboundHave.length) {
+    const have = new Set(outboundHave);
+    const hit = outboundWant.filter((t) => have.has(t)).length;
+    scores.push(hit / outboundWant.length);
+  }
+  if (inboundWant.length && inboundHave.length) {
+    const have = new Set(inboundHave);
+    const hit = inboundWant.filter((t) => have.has(t)).length;
+    scores.push(hit / inboundWant.length);
+  }
+  if (!scores.length) {
+    // Shared taste / style bag fallback
+    const aTags = new Set([...(aPrefs.style_tags ?? []), ...(aPrefs.looking_for_tags ?? [])]);
+    const bTags = [...(bPrefs.style_tags ?? []), ...(bPrefs.looking_for_tags ?? [])];
+    if (!aTags.size || !bTags.length) return 0.3;
+    const hit = bTags.filter((t) => aTags.has(t)).length;
+    return Math.min(1, hit / Math.max(3, Math.min(aTags.size, bTags.length)));
+  }
+  return scores.reduce((s, x) => s + x, 0) / scores.length;
+}
+
+/** Soft score: 1 inside seek range, falls off outside. */
+export function heightRangeScore(
+  candidateHeightCm: number | null | undefined,
+  viewerPrefs: PhysicalPrefs | null,
+): number {
+  const min = viewerPrefs?.height_cm_min ?? null;
+  const max = viewerPrefs?.height_cm_max ?? null;
+  if (min == null && max == null) return 0.5;
+  if (candidateHeightCm == null) return 0.4;
+  const lo = min ?? 120;
+  const hi = max ?? 230;
+  if (candidateHeightCm >= lo && candidateHeightCm <= hi) return 1;
+  const dist = candidateHeightCm < lo ? lo - candidateHeightCm : candidateHeightCm - hi;
+  return Math.max(0, 1 - dist / 30);
 }
 
 /** Appearance proxy until photo embeddings (Phase 4). */
 export function appearanceProxyScore(
   aPrefs: PhysicalPrefs | null,
   bPrefs: PhysicalPrefs | null,
+  candidateHeightCm: number | null = null,
   flashAgreement: number | null = null,
 ): number {
-  const physical = physicalOverlapScore(aPrefs, bPrefs);
+  const tags = physicalOverlapScore(aPrefs, bPrefs);
+  const height = heightRangeScore(candidateHeightCm, aPrefs);
+  const hasHeightPrefs = aPrefs?.height_cm_min != null || aPrefs?.height_cm_max != null;
+  const physical = hasHeightPrefs ? 0.45 * tags + 0.55 * height : tags;
   if (flashAgreement == null) return physical;
   return Math.min(1, 0.65 * physical + 0.35 * flashAgreement);
 }
@@ -223,7 +263,12 @@ export function compatibilityScore(args: {
   }
 
   const w = args.weights ?? weightsForIntent(viewer.intent);
-  const appearance = appearanceProxyScore(args.viewerPrefs, args.candidatePrefs, args.flashAgreement ?? null);
+  const appearance = appearanceProxyScore(
+    args.viewerPrefs,
+    args.candidatePrefs,
+    candidate.height_cm,
+    args.flashAgreement ?? null,
+  );
   const proximity = proximityScore(args.distanceM, viewer.radius_m || 150, args.presenceAgeSec);
   const intent_align = intentAlignmentScore(viewer.intent, candidate.intent);
   const interests = interestOverlapScore(args.viewerInterests, args.candidateInterests);

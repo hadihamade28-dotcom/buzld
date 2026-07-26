@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SkipLink } from '@/components/OnboardingChoices';
@@ -9,32 +9,49 @@ import { colors, fonts, radii, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { playTick } from '@/lib/haptics';
-import { AUTO_ADVANCE_MS, FLASH_SAMPLES, progressFor } from '@/lib/onboarding';
+import {
+  AUTO_ADVANCE_MS,
+  flashAudienceFromSeeking,
+  flashRequired,
+  flashSamplesFor,
+  progressFor,
+} from '@/lib/onboarding';
 
 export default function FlashScreen() {
-  const { refresh } = useAuth();
+  const { profile, refresh } = useAuth();
   const router = useRouter();
+  const audience = flashAudienceFromSeeking(profile?.seeking);
+  const samples = useMemo(() => flashSamplesFor(audience), [audience]);
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const progress = progressFor('flash');
-  const sample = FLASH_SAMPLES[index];
+  const sample = samples[index];
+  const required = flashRequired(profile?.intent);
 
   useEffect(() => {
-    api.logOnboardingEvent('flash', 'view').catch(() => undefined);
-  }, []);
+    setIndex(0);
+  }, [audience]);
+
+  useEffect(() => {
+    api.logOnboardingEvent('flash', 'view', { required, audience }).catch(() => undefined);
+  }, [required, audience]);
+
+  const goNext = () => {
+    playTick();
+    setTimeout(() => router.push('/(onboarding)/looking-for'), AUTO_ADVANCE_MS);
+  };
 
   const finish = async (skipped: boolean) => {
     setBusy(true);
     try {
       if (skipped) {
-        await api.skipOnboardingGap('height-prompt', 'flash');
+        await api.skipOnboardingGap('looking-for', 'flash');
       } else {
-        await api.advanceOnboarding('height-prompt', {});
+        await api.advanceOnboarding('looking-for', {});
         await api.clearProfileGap('flash').catch(() => undefined);
       }
       await refresh();
-      playTick();
-      setTimeout(() => router.push('/(onboarding)/height-prompt'), AUTO_ADVANCE_MS);
+      goNext();
     } finally {
       setBusy(false);
     }
@@ -46,7 +63,7 @@ export default function FlashScreen() {
     try {
       await api.saveFlashResponse(sample.id, liked);
       playTick();
-      if (index >= FLASH_SAMPLES.length - 1) {
+      if (index >= samples.length - 1) {
         await finish(false);
         return;
       }
@@ -58,22 +75,29 @@ export default function FlashScreen() {
 
   if (!sample) return null;
 
+  const audienceLabel =
+    audience === 'women' ? 'women' : audience === 'men' ? 'men' : 'people you’re open to';
+
   return (
     <FlowShell
       headerHeight={120}
       header={<OnboardingProgress step={progress.step} total={progress.total} />}
       footer={
-        <View style={styles.footer}>
-          <SkipLink onPress={() => finish(true)} />
-        </View>
+        !required ? (
+          <View style={styles.footer}>
+            <SkipLink onPress={() => finish(true)} />
+          </View>
+        ) : undefined
       }
     >
       <Title>Your type</Title>
       <Body style={styles.body}>
-        Quick flash round — tap ♥ or ✕. Seeds better matches before your first real buzz.
+        {required
+          ? `Flash round for ${audienceLabel} — required for better matches. Tap ♥ or ✕.`
+          : `Quick flash of ${audienceLabel} — tap ♥ or ✕ to seed better matches.`}
       </Body>
       <Body style={styles.meta}>
-        {index + 1} / {FLASH_SAMPLES.length}
+        {index + 1} / {samples.length}
       </Body>
       <Image source={{ uri: sample.url }} style={styles.photo} />
       <View style={styles.actions}>
