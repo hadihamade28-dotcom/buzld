@@ -1,0 +1,32 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.env.local
+.env*.local
+*.local
+
+# Expo / mobile
+.expo/
+dist/
+web-build/
+apps/mobile/ios/
+apps/mobile/android/
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+
+# Web / Vite / TanStack
+.tanstack/
+.output/
+.nitro/
+.vinxi/
+.wrangler/
+.dev.vars
+dist-ssr/
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json

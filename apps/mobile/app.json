@@ -1,0 +1,92 @@
+{
+  "expo": {
+    "name": "Vicino",
+    "slug": "vicino",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "vicino",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.vicino.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Vicino uses your location to find compatible people nearby.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Vicino needs background location while discovery is on so nearby matches can find you.",
+        "NSBluetoothAlwaysUsageDescription": "Vicino uses Bluetooth to confirm when a match is physically close.",
+        "NSBluetoothPeripheralUsageDescription": "Vicino broadcasts a short-lived token so nearby matches can find each other.",
+        "UIBackgroundModes": ["location", "bluetooth-central", "bluetooth-peripheral"]
+      }
+    },
+    "android": {
+      "package": "app.vicino.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_SCAN",
+        "BLUETOOTH_ADVERTISE",
+        "BLUETOOTH_CONNECT",
+        "VIBRATE",
+        "POST_NOTIFICATIONS"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      "expo-image",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Vicino to use your location to find nearby matches.",
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Vicino needs a photo for match reveals."
+        }
+      ],
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": true,
+          "modes": ["peripheral", "central"],
+          "bluetoothAlwaysPermission": "Allow Vicino to use Bluetooth to confirm nearby matches."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFF5F7"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "vicino-local"
+      }
+    }
+  }
+}

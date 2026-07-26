@@ -1,0 +1,21 @@
+{
+  "name": "buzld",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Buzld — proximity dating. Feel the buzz when they're close.",
+  "workspaces": [
+    "apps/web",
+    "apps/mobile"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@buzld/web",
+    "web": "npm run dev --workspace=@buzld/web",
+    "mobile": "npm run start --workspace=@buzld/mobile",
+    "build": "npm run build --workspace=@buzld/web",
+    "lint": "npm run lint --workspace=@buzld/web",
+    "typecheck": "npm run typecheck --workspace=@buzld/mobile"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,13 @@
+project_id = "vicino"
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
+
+[functions.find-candidates]
+verify_jwt = true
+
+[functions.confirm-proximity]
+verify_jwt = true
