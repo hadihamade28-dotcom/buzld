@@ -1,32 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import {
+  COMPAT_THRESHOLD,
+  compatibilityScore,
+  weightsFromRow,
+  type ProfileRow,
+  type PrefsRow,
+  type WeightsRow,
+} from '../_shared/scoring.ts'
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-type Profile = {
-  id: string
-  gender: string | null
-  seeking: string | null
-  discovery_enabled: boolean
-  radius_m: number
-}
-
-function reciprocal(a: Profile, b: Profile) {
-  const ok = (gender: string | null, seeking: string | null) => {
-    if (!gender || !seeking) return false
-    if (seeking === 'everyone') return true
-    return gender === seeking
-  }
-  return ok(b.gender, a.seeking) && ok(a.gender, b.seeking)
-}
-
-function overlap(a: string[], b: string[]) {
-  if (!a.length || !b.length) return 0
-  const setB = new Set(b)
-  const hit = a.filter((x) => setB.has(x)).length
-  return hit / Math.max(a.length, b.length)
 }
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -41,8 +25,6 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
 }
 
 function neighborPrefixes(geohash: string) {
-  // Approximate: same precision cell + prefix neighbors via known 8-neighbor table is complex;
-  // for MVP, query by shared 6-char prefix (±~1.2km) then filter by distance.
   return geohash.slice(0, 6)
 }
 
@@ -77,11 +59,11 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { data: myInterests } = await admin
-      .from('profile_interests')
-      .select('interest')
-      .eq('user_id', uid)
-    const { data: myPrefs } = await admin.from('physical_prefs').select('*').eq('user_id', uid).maybeSingle()
+    const [{ data: myInterests }, { data: myPrefs }, { data: myWeights }] = await Promise.all([
+      admin.from('profile_interests').select('interest').eq('user_id', uid),
+      admin.from('physical_prefs').select('*').eq('user_id', uid).maybeSingle(),
+      admin.from('user_weights').select('*').eq('user_id', uid).maybeSingle(),
+    ])
 
     const prefix = neighborPrefixes(mePresence.geohash)
     const { data: nearby } = await admin
@@ -102,7 +84,6 @@ Deno.serve(async (req) => {
 
     const nearbyIds = nearbyUsers.map((p) => p.user_id)
 
-    // Batch-fetch all needed data in parallel to avoid N+1 queries
     const [
       { data: otherProfiles },
       { data: allOtherInterests },
@@ -126,7 +107,6 @@ Deno.serve(async (req) => {
         ),
     ])
 
-    // Index batched results by user_id for O(1) lookup
     const profileMap = new Map((otherProfiles ?? []).map((p) => [p.id, p]))
     const interestsMap = new Map<string, string[]>()
     for (const row of allOtherInterests ?? []) {
@@ -135,34 +115,38 @@ Deno.serve(async (req) => {
       interestsMap.set(row.user_id, list)
     }
     const prefsMap = new Map((allOtherPrefs ?? []).map((p) => [p.user_id, p]))
-    const matchMap = new Map<string, typeof existingMatches extends (infer T)[] | null ? T : never>()
+    const matchMap = new Map<string, (typeof existingMatches extends (infer T)[] | null ? T : never)>()
     for (const m of existingMatches ?? []) {
       const peerId = m.user_a === uid ? m.user_b : m.user_a
       matchMap.set(peerId, m)
     }
 
+    const viewer = meProfile as ProfileRow
+    const weights = weightsFromRow(myWeights as WeightsRow | null, viewer.intent)
+    const now = Date.now()
+
     for (const p of nearbyUsers) {
       const dist = haversine(mePresence.lat, mePresence.lng, p.lat, p.lng)
       if (dist > (meProfile.radius_m || 150)) continue
 
-      const otherProfile = profileMap.get(p.user_id)
+      const otherProfile = profileMap.get(p.user_id) as ProfileRow | undefined
       if (!otherProfile?.discovery_enabled) continue
-      if (!reciprocal(meProfile as Profile, otherProfile as Profile)) continue
 
-      const otherInterests = interestsMap.get(p.user_id) ?? []
-      const otherPrefs = prefsMap.get(p.user_id)
+      const presenceAgeSec = Math.max(0, (now - new Date(p.updated_at).getTime()) / 1000)
+      const scored = compatibilityScore({
+        viewer,
+        candidate: otherProfile,
+        viewerInterests: (myInterests ?? []).map((i) => i.interest),
+        candidateInterests: interestsMap.get(p.user_id) ?? [],
+        viewerPrefs: (myPrefs as PrefsRow | null) ?? null,
+        candidatePrefs: (prefsMap.get(p.user_id) as PrefsRow | undefined) ?? null,
+        distanceM: dist,
+        presenceAgeSec,
+        weights,
+      })
 
-      const interestScore = overlap(
-        (myInterests ?? []).map((i) => i.interest),
-        otherInterests,
-      )
-      const aTags = [...(myPrefs?.style_tags ?? []), ...(myPrefs?.looking_for_tags ?? [])]
-      const bTags = [...(otherPrefs?.style_tags ?? []), ...(otherPrefs?.looking_for_tags ?? [])]
-      const physicalScore = aTags.length && bTags.length
-        ? overlap(aTags, bTags)
-        : 0.3
-      const score = 0.55 * interestScore + 0.45 * physicalScore
-      if (score < 0.35) continue
+      const score = scored.total
+      if (score < COMPAT_THRESHOLD) continue
 
       const user_a = uid < p.user_id ? uid : p.user_id
       const user_b = uid < p.user_id ? p.user_id : uid
@@ -176,7 +160,10 @@ Deno.serve(async (req) => {
           score,
         })
       } else if (existing.status === 'candidate') {
-        await admin.from('nearby_matches').update({ score, updated_at: new Date().toISOString() }).eq('id', existing.id)
+        await admin
+          .from('nearby_matches')
+          .update({ score, updated_at: new Date().toISOString() })
+          .eq('id', existing.id)
       }
 
       candidates.push({
@@ -184,6 +171,7 @@ Deno.serve(async (req) => {
         ble_token: p.ble_token,
         score,
         distance_m: Math.round(dist),
+        meta: scored.components,
       })
     }
 

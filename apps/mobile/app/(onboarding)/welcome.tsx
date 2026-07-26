@@ -1,10 +1,13 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { FlowShell } from '@/components/FlowShell';
 import { BrandMark, Button, Eyebrow, Title } from '@/components/ui';
 import { colors, fonts, radii, spacing } from '@/constants/theme';
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { stepRoute } from '@/lib/onboarding';
 
 const STEPS = [
   { emoji: '📍', title: 'Find nearby', desc: 'See compatible people around you in real time' },
@@ -14,19 +17,36 @@ const STEPS = [
 
 export default function WelcomeOnboarding() {
   const router = useRouter();
+  const { profile } = useAuth();
+
+  useEffect(() => {
+    api.logOnboardingEvent('welcome', 'view').catch(() => undefined);
+  }, []);
+
+  const start = () => {
+    const resume = profile?.onboarding_step && profile.onboarding_step !== 'done'
+      ? stepRoute(profile.onboarding_step)
+      : '/(onboarding)/name-birthday';
+    router.push(resume);
+  };
+
   return (
     <FlowShell
       header={<BrandMark large light />}
       footer={
         <View style={styles.footer}>
-          <Button label="Create my profile" onPress={() => router.push('/(onboarding)/profile')} large />
+          <Button
+            label={profile?.onboarding_step ? 'Continue setup' : 'Create my profile'}
+            onPress={start}
+            large
+          />
         </View>
       }
     >
       <Eyebrow>How it works</Eyebrow>
-      <Title style={styles.title}>You're almost in</Title>
+      <Title style={styles.title}>You&apos;re almost in</Title>
       <Text style={styles.subtitle}>
-        Three steps to start meeting people actually near you.
+        A few quick taps — under 90 seconds to your first Live screen.
       </Text>
 
       <View style={styles.steps}>

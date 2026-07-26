@@ -6,12 +6,19 @@ export type Person = {
   work: string;
   prompts: { q: string; a: string }[];
   interests: string[];
-  /** two oklch stops used to build the avatar gradient */
+  /** Portrait photo URL */
+  photo: string;
+  /** Extra photos for profile / reveal cards */
+  photos: string[];
+  /** Fallback gradient if a photo fails to load */
   hue: [string, string];
   /** metres away, updates as people move around */
   distance: number;
   place: string;
 };
+
+const img = (id: string, w = 640) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${w}&q=80`;
 
 export const people: Person[] = [
   {
@@ -25,6 +32,12 @@ export const people: Person[] = [
       { q: "Sunday, 9am", a: "Flower market, then an unreasonable amount of coffee." },
     ],
     interests: ["Baking", "Vinyl", "Cold swims"],
+    photo: img("photo-1534528741775-53994a69daeb"),
+    photos: [
+      img("photo-1534528741775-53994a69daeb"),
+      img("photo-1524504388940-b1c17226555e", 800),
+      img("photo-1488426862026-3ee34a7d66df", 800),
+    ],
     hue: ["oklch(0.72 0.17 30)", "oklch(0.78 0.14 60)"],
     distance: 38,
     place: "Brill Place Cafe",
@@ -40,6 +53,12 @@ export const people: Person[] = [
       { q: "Two truths, one lie", a: "Ex-lifeguard, can't whistle, been to Antarctica." },
     ],
     interests: ["Drawing", "Bouldering", "Jazz"],
+    photo: img("photo-1506794778202-cad84cf45f1d"),
+    photos: [
+      img("photo-1506794778202-cad84cf45f1d"),
+      img("photo-1500648767791-00dcc994a43e", 800),
+      img("photo-1492562080023-ab3db95bfbce", 800),
+    ],
     hue: ["oklch(0.66 0.15 250)", "oklch(0.74 0.13 200)"],
     distance: 64,
     place: "Regent's Canal path",
@@ -55,6 +74,12 @@ export const people: Person[] = [
       { q: "I'm weirdly attracted to", a: "People who fold their laundry immediately." },
     ],
     interests: ["Books", "Running", "Ceramics"],
+    photo: img("photo-1529626455594-4ff0802cfb7e"),
+    photos: [
+      img("photo-1529626455594-4ff0802cfb7e"),
+      img("photo-1494790108377-be9c29b29330", 800),
+      img("photo-1517841905240-472988babdf9", 800),
+    ],
     hue: ["oklch(0.7 0.16 340)", "oklch(0.78 0.13 20)"],
     distance: 12,
     place: "Platform 4, Old Street",
@@ -70,6 +95,12 @@ export const people: Person[] = [
       { q: "Dating me is like", a: "A very good playlist with two skippable tracks." },
     ],
     interests: ["Synths", "Film", "Cycling"],
+    photo: img("photo-1531746020798-e6953c6e8e04"),
+    photos: [
+      img("photo-1531746020798-e6953c6e8e04"),
+      img("photo-1521119983545-0d43bba6b4c9", 800),
+      img("photo-1544005313-94ddf0286df2", 800),
+    ],
     hue: ["oklch(0.68 0.15 150)", "oklch(0.78 0.13 110)"],
     distance: 91,
     place: "Hoxton Square",
@@ -85,6 +116,12 @@ export const people: Person[] = [
       { q: "Together we could", a: "Find that bench." },
     ],
     interests: ["Maps", "Tea", "Long walks"],
+    photo: img("photo-1507003211169-0a1dd7228f2d"),
+    photos: [
+      img("photo-1507003211169-0a1dd7228f2d"),
+      img("photo-1472099645785-5658abf4ff4e", 800),
+      img("photo-1463453091185-61582044d556", 800),
+    ],
     hue: ["oklch(0.66 0.14 290)", "oklch(0.75 0.14 330)"],
     distance: 150,
     place: "Barbican Highwalk",
@@ -100,6 +137,12 @@ export const people: Person[] = [
       { q: "I go crazy for", a: "A market stall with one thing on the menu." },
     ],
     interests: ["Gardening", "Football", "Cooking"],
+    photo: img("photo-1438761681033-6461ffad8d80"),
+    photos: [
+      img("photo-1438761681033-6461ffad8d80"),
+      img("photo-1548142813-c348350df52b", 800),
+      img("photo-1580489944761-15a19d654956", 800),
+    ],
     hue: ["oklch(0.7 0.15 80)", "oklch(0.79 0.13 120)"],
     distance: 210,
     place: "Victoria Park gate",
@@ -169,6 +212,12 @@ export const me = {
   age: 28,
   work: "Product designer · Kite",
   bio: "Walks everywhere. Owns two chairs, both uncomfortable.",
+  photo: img("photo-1500648767791-00dcc994a43e"),
+  photos: [
+    img("photo-1500648767791-00dcc994a43e", 800),
+    img("photo-1472099645785-5658abf4ff4e", 800),
+    img("photo-1519085360753-af0119f7cbe7", 800),
+  ],
   hue: ["oklch(0.68 0.18 25)", "oklch(0.78 0.15 60)"] as [string, string],
   prompts: [
     { q: "The last thing I got excited about", a: "A bakery that opens at 6am near my flat." },

@@ -8,9 +8,9 @@ import { byId, conversations, type Message } from "@/lib/mock-data";
 export const Route = createFileRoute("/chat/$id")({
   head: () => ({
     meta: [
-      { title: "Chat — Orbit" },
+      { title: "Chat — Buzld" },
       { name: "description", content: "Talk to someone you actually crossed paths with today." },
-      { property: "og:title", content: "Chat — Orbit" },
+      { property: "og:title", content: "Chat — Buzld" },
       { property: "og:description", content: "Talk to someone you actually crossed paths with today." },
     ],
   }),
@@ -62,7 +62,7 @@ function Chat() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <Avatar name={person.name} hue={person.hue} className="h-10 w-10" />
+        <Avatar name={person.name} src={person.photo} hue={person.hue} className="h-10 w-10" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{person.name}</p>
           <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">

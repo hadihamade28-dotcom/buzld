@@ -58,7 +58,18 @@ export const api = {
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
-    return data as Profile | null;
+    if (!data) return null;
+    const row = data as Profile;
+    return {
+      ...row,
+      lifestyle: row.lifestyle ?? {},
+      profile_gaps: row.profile_gaps ?? [],
+      age_min: row.age_min ?? 18,
+      age_max: row.age_max ?? 99,
+      consent_behavioral: row.consent_behavioral ?? false,
+      consent_photo_analysis: row.consent_photo_analysis ?? false,
+      photo_urls: row.photo_urls ?? [],
+    } as Profile;
   },
 
   async updateProfile(patch: Partial<Profile>) {
@@ -72,9 +83,58 @@ export const api = {
     return data as Profile;
   },
 
-  async uploadPhoto(localUri: string) {
+  async uploadPhoto(localUri: string, slot = 0) {
     const id = await requireUserId();
-    return uploadProfilePhoto(id, localUri);
+    return uploadProfilePhoto(id, localUri, slot);
+  },
+
+  async logOnboardingEvent(step: string, action: string, meta: Record<string, unknown> = {}) {
+    const id = await requireUserId();
+    const { error } = await requireClient().from('onboarding_events').insert({
+      user_id: id,
+      step,
+      action,
+      meta,
+    });
+    if (error) throw error;
+  },
+
+  async advanceOnboarding(step: string, patch: Partial<Profile> = {}) {
+    const profile = await this.updateProfile({
+      ...patch,
+      onboarding_step: step,
+    });
+    await this.logOnboardingEvent(step, 'answer', { fields: Object.keys(patch) }).catch(() => undefined);
+    return profile;
+  },
+
+  async skipOnboardingGap(step: string, gap: string) {
+    const id = await requireUserId();
+    const current = await this.getProfile(id);
+    const gaps = Array.from(new Set([...(current?.profile_gaps ?? []), gap]));
+    const profile = await this.updateProfile({
+      profile_gaps: gaps,
+      onboarding_step: step,
+    });
+    await this.logOnboardingEvent(step, 'skip', { gap }).catch(() => undefined);
+    return profile;
+  },
+
+  async saveFlashResponse(sampleId: string, liked: boolean) {
+    const id = await requireUserId();
+    const { error } = await requireClient().from('flash_round_responses').upsert({
+      user_id: id,
+      sample_id: sampleId,
+      liked,
+    });
+    if (error) throw error;
+  },
+
+  async clearProfileGap(gap: string) {
+    const id = await requireUserId();
+    const current = await this.getProfile(id);
+    const gaps = (current?.profile_gaps ?? []).filter((g) => g !== gap);
+    return this.updateProfile({ profile_gaps: gaps });
   },
 
   async getInterests(userId?: string) {

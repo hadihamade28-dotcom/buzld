@@ -2,64 +2,82 @@ import { cn } from "@/lib/utils";
 
 type AvatarProps = {
   name: string;
-  hue: [string, string];
+  /** Portrait URL. Falls back to initials on a gradient if missing. */
+  src?: string;
+  hue?: [string, string];
   className?: string;
-  /** tailwind text size utility for the initial */
+  /** @deprecated Kept for call-site compatibility; unused when src is set. */
   textClassName?: string;
   ring?: boolean;
 };
 
-export function Avatar({ name, hue, className, textClassName, ring }: AvatarProps) {
+export function Avatar({ name, src, hue, className, ring }: AvatarProps) {
   return (
     <div
       className={cn(
-        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted",
         ring && "ring-2 ring-background",
         className,
       )}
-      style={{ backgroundImage: `linear-gradient(140deg, ${hue[0]}, ${hue[1]})` }}
+      style={
+        !src && hue
+          ? { backgroundImage: `linear-gradient(140deg, ${hue[0]}, ${hue[1]})` }
+          : undefined
+      }
       aria-hidden="true"
     >
-      <span
-        className={cn(
-          "font-display font-semibold text-primary-foreground/95 drop-shadow-sm",
-          textClassName ?? "text-base",
-        )}
-      >
-        {name.slice(0, 1).toUpperCase()}
-      </span>
-      <span className="pointer-events-none absolute -right-3 -top-4 h-12 w-12 rounded-full bg-primary-foreground/15 blur-md" />
+      {src ? (
+        <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+      ) : (
+        <span className="font-display text-base font-semibold text-primary-foreground/95">
+          {name.slice(0, 1).toUpperCase()}
+        </span>
+      )}
     </div>
   );
 }
 
-/** Large "photo card" stand-in: the shape a user's uploaded picture fills. */
+/** Large photo card: the shape a user's uploaded picture fills. */
 export function PhotoPanel({
   name,
+  src,
   hue,
   caption,
   className,
 }: {
   name: string;
-  hue: [string, string];
+  src?: string;
+  hue?: [string, string];
   caption?: string;
   className?: string;
 }) {
   return (
     <div
-      className={cn("relative flex items-end overflow-hidden rounded-3xl", className)}
-      style={{ backgroundImage: `linear-gradient(150deg, ${hue[0]}, ${hue[1]})` }}
+      className={cn("relative flex items-end overflow-hidden rounded-3xl bg-muted", className)}
+      style={
+        !src && hue
+          ? { backgroundImage: `linear-gradient(150deg, ${hue[0]}, ${hue[1]})` }
+          : undefined
+      }
     >
-      <span
-        className="pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full opacity-30 blur-2xl"
-        style={{ background: "oklch(1 0 0)" }}
-      />
-      <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,oklch(0.2_0.03_30/55%),transparent_55%)]" />
-      <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-display text-8xl font-semibold text-primary-foreground/30">
-        {name.slice(0, 1).toUpperCase()}
-      </span>
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-display text-8xl font-semibold text-primary-foreground/30">
+          {name.slice(0, 1).toUpperCase()}
+        </span>
+      )}
       {caption ? (
-        <p className="relative z-10 p-4 text-sm font-medium text-primary-foreground/90">{caption}</p>
+        <>
+          <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,oklch(0.15_0.02_255/55%),transparent_50%)]" />
+          <p className="relative z-10 p-4 text-sm font-medium text-primary-foreground/95">{caption}</p>
+        </>
       ) : null}
     </div>
   );

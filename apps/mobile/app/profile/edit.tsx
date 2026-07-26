@@ -20,7 +20,10 @@ export default function EditProfileScreen() {
   const existingPhoto = profile?.photo_urls?.[0] ?? null;
 
   const [name, setName] = useState(profile?.display_name ?? '');
-  const [bio, setBio] = useState(profile?.bio ?? '');
+  const [bio, setBio] = useState(profile?.bio ?? profile?.prompt ?? '');
+  const [height, setHeight] = useState(
+    profile?.height_cm != null ? String(profile.height_cm) : '',
+  );
   const [gender, setGender] = useState<Gender | null>(profile?.gender ?? null);
   const [seek, setSeek] = useState<Seeking | null>(profile?.seeking ?? null);
   const [localPhoto, setLocalPhoto] = useState<string | null>(null);
@@ -40,18 +43,28 @@ export default function EditProfileScreen() {
       setError('Name, gender, and seeking are required.');
       return;
     }
+    const heightCm = height.trim() ? Number(height) : null;
+    if (height.trim() && (Number.isNaN(heightCm!) || heightCm! < 120 || heightCm! > 230)) {
+      setError('Height must be between 120 and 230 cm.');
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
       let photoPath = existingPhoto;
       if (localPhoto) photoPath = await api.uploadPhoto(localPhoto);
+      const trimmedBio = bio.trim();
       await api.updateProfile({
         display_name: name.trim(),
-        bio: bio.trim() || null,
+        bio: trimmedBio || null,
+        prompt: trimmedBio || null,
+        height_cm: heightCm,
         gender,
         seeking: seek,
         photo_urls: photoPath ? [photoPath] : [],
       });
+      if (heightCm) await api.clearProfileGap('height').catch(() => undefined);
+      if (trimmedBio) await api.clearProfileGap('prompt').catch(() => undefined);
       await refresh();
       router.back();
     } catch (e) {
@@ -83,7 +96,19 @@ export default function EditProfileScreen() {
       />
 
       <Input placeholder="First name" value={name} onChangeText={setName} />
-      <Input placeholder="Bio" value={bio} onChangeText={setBio} style={styles.bioInput} multiline />
+      <Input
+        placeholder="Bio / prompt"
+        value={bio}
+        onChangeText={setBio}
+        style={styles.bioInput}
+        multiline
+      />
+      <Input
+        placeholder="Height (cm)"
+        value={height}
+        onChangeText={setHeight}
+        keyboardType="number-pad"
+      />
 
       <SectionLabel style={{ marginTop: spacing.md }}>I am</SectionLabel>
       <View style={styles.chipRow}>

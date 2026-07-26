@@ -11,6 +11,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MatchReveal } from '@/components/MatchReveal';
+import { ProfileBoostPrompt } from '@/components/ProfileBoostPrompt';
 import { AppScreen } from '@/components/FlowShell';
 import { BrandMark, Button, StatusPill } from '@/components/ui';
 import { colors, fonts, gradients, layout, radii, shadows, spacing } from '@/constants/theme';
@@ -162,6 +163,8 @@ export default function LiveScreen() {
         <View style={[styles.header, { paddingTop: spacing.sm }]}>
           <BrandMark />
         </View>
+
+        <ProfileBoostPrompt />
 
         <View style={styles.hero}>
           <View style={styles.orbWrap}>

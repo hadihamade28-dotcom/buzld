@@ -1,22 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Radar as RadarIcon, Vibrate, Waves } from "lucide-react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { BuzzSheet } from "@/components/BuzzSheet";
 import { Avatar } from "@/components/Avatar";
 import { people, type Person } from "@/lib/mock-data";
-import { PageHeader } from "@/components/PageHeader";
 
 export const Route = createFileRoute("/nearby")({
   head: () => ({
     meta: [
-      { title: "Orbit — Dating without swiping" },
+      { title: "Buzld — Dating without swiping" },
       {
         name: "description",
         content:
-          "Orbit matches you with people you actually walk past. Your phones buzz when you're near, photos appear, and only a mutual yes opens a chat.",
+          "Buzld matches you with people you actually walk past. Your phones buzz when you're near, photos appear, and only a mutual yes opens a chat.",
       },
-      { property: "og:title", content: "Orbit — Dating without swiping" },
+      { property: "og:title", content: "Buzld — Dating without swiping" },
       {
         property: "og:description",
         content: "Your phones buzz when you're near each other. No swiping, just real proximity.",
@@ -26,132 +24,134 @@ export const Route = createFileRoute("/nearby")({
   component: Nearby,
 });
 
-const ORBITS = [
-  { radius: 92, duration: "26s" },
-  { radius: 138, duration: "38s" },
-  { radius: 184, duration: "50s" },
-];
+const RINGS = [72, 112, 152];
+
+/** Fixed orbit lanes so motion stays smooth and readable. */
+const ORBITS = people.slice(0, 5).map((person, i) => ({
+  person,
+  radius: 56 + ((i % 3) + 1) * 32,
+  duration: `${24 + i * 8}s`,
+  start: (i / 5) * 360,
+}));
 
 function Nearby() {
   const [live, setLive] = useState(true);
-  const [tick, setTick] = useState(0);
   const [buzzing, setBuzzing] = useState<Person | null>(null);
 
-  useEffect(() => {
-    if (!live) return;
-    const i = setInterval(() => setTick((t) => t + 1), 2600);
-    return () => clearInterval(i);
-  }, [live]);
-
-  const nearby = useMemo(() => {
-    return people.map((p, idx) => {
-      const drift = Math.round(Math.sin((tick + idx * 2) / 2.2) * 22);
-      return { ...p, distance: Math.max(6, p.distance + drift) };
-    });
-  }, [tick]);
-
-  const closest = nearby.slice().sort((a, b) => a.distance - b.distance)[0];
+  const closest = [...people].sort((a, b) => a.distance - b.distance)[0];
 
   return (
     <PhoneFrame>
-      <PageHeader
-        eyebrow="Orbit"
-        title="Out and about"
-        subtitle={
-          live
-            ? `${nearby.length} people with Orbit on are moving around you right now.`
-            : "Discovery paused. Nobody can find you."
-        }
-        action={
+      <header className="px-6 pb-1 pt-[max(1.75rem,env(safe-area-inset-top))]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-display text-[13px] font-semibold lowercase tracking-[-0.02em] text-ink">
+              buzld
+            </p>
+            <h1 className="mt-1 font-display text-[1.55rem] font-semibold tracking-[-0.03em]">
+              Nearby
+            </h1>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+              {live ? `${people.length} people close by` : "Discovery paused"}
+            </p>
+          </div>
           <button
+            type="button"
             onClick={() => setLive((v) => !v)}
-            className={`flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
-              live
-                ? "gradient-warm text-primary-foreground shadow-soft"
-                : "border border-border bg-background text-muted-foreground"
+            className={`mt-1 flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
+              live ? "bg-ink text-primary-foreground" : "border border-border text-muted-foreground"
             }`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${live ? "bg-primary-foreground animate-pulse" : "bg-muted-foreground"}`}
+              className={`h-1.5 w-1.5 rounded-full ${live ? "bg-primary-foreground" : "bg-muted-foreground"}`}
             />
             {live ? "Live" : "Paused"}
           </button>
-        }
-      />
+        </div>
+      </header>
 
-      {/* radar */}
-      <section className="relative mx-auto mt-1 flex h-[290px] w-[290px] items-center justify-center">
-        <span className="absolute h-[290px] w-[290px] rounded-full bg-[radial-gradient(circle,oklch(0.9_0.09_35/45%),transparent_68%)]" />
-        {ORBITS.map((o) => (
+      <section className="relative mx-auto mt-6 flex h-[304px] w-[304px] items-center justify-center">
+        {RINGS.map((r) => (
           <span
-            key={o.radius}
-            className="absolute rounded-full border border-primary/12"
-            style={{ width: o.radius * 2, height: o.radius * 2 }}
+            key={r}
+            className="absolute rounded-full border border-foreground/[0.07]"
+            style={{ width: r * 2, height: r * 2 }}
           />
         ))}
+
         {live &&
           [0, 1, 2].map((i) => (
             <span
               key={i}
-              className="absolute h-[290px] w-[290px] animate-radar rounded-full border border-primary/25 bg-primary/8"
-              style={{ animationDelay: `${i * 1.05}s` }}
+              className="absolute h-[304px] w-[304px] animate-radar rounded-full border border-ink/20"
+              style={{ animationDelay: `${i * 1.35}s` }}
             />
           ))}
 
-        <div className="relative z-10 flex h-[62px] w-[62px] items-center justify-center rounded-full gradient-warm shadow-float ring-[6px] ring-background/70">
-          <RadarIcon className="h-7 w-7 text-primary-foreground" />
-        </div>
+        <span className="relative z-10 h-2.5 w-2.5 rounded-full bg-ink shadow-[0_0_0_6px_oklch(0.16_0.025_255_/_0.06)]" />
 
-        {nearby.slice(0, 5).map((p, i) => {
-          const angle = (i / 5) * Math.PI * 2 + tick * 0.08;
-          const r = 58 + Math.min(p.distance, 220) * 0.48;
-          const x = Math.round(Math.cos(angle) * r);
-          const y = Math.round(Math.sin(angle) * r);
+        {ORBITS.map(({ person, radius, duration, start }) => {
+          const spinStyle = {
+            "--orbit-duration": duration,
+            animationPlayState: live ? "running" : "paused",
+          } as CSSProperties;
+
           return (
-            <button
-              key={p.id}
-              onClick={() => setBuzzing(p)}
-              className="absolute z-20 transition-transform duration-[2600ms] ease-linear hover:scale-110"
-              style={{ transform: `translate(${x}px, ${y}px)` }}
-              aria-label={`${p.name}, ${p.distance} metres away`}
+            <div
+              key={person.id}
+              className="pointer-events-none absolute"
+              style={{
+                width: radius * 2,
+                height: radius * 2,
+                transform: `rotate(${start}deg)`,
+              }}
             >
-              <Avatar name={p.name} hue={p.hue} className="h-11 w-11 shadow-float ring-[3px]" ring />
-            </button>
+              <div className="absolute inset-0 animate-orbit" style={spinStyle}>
+                <button
+                  type="button"
+                  onClick={() => setBuzzing(person)}
+                  className="pointer-events-auto absolute left-1/2 top-0 z-20 rounded-full transition-transform hover:scale-110 active:scale-95 animate-orbit-item"
+                  style={spinStyle}
+                  aria-label={`${person.name}, ${person.distance} metres away`}
+                >
+                  <Avatar
+                    name={person.name}
+                    src={person.photo}
+                    hue={person.hue}
+                    className="h-10 w-10 shadow-soft ring-2 ring-background"
+                  />
+                </button>
+              </div>
+            </div>
           );
         })}
       </section>
 
-      <section className="mt-6 px-5">
-        <div className="rounded-[1.6rem] border border-border/60 bg-surface p-4 shadow-float">
-          <div className="flex items-center gap-3">
-            <Avatar name={closest.name} hue={closest.hue} className="h-12 w-12" textClassName="text-lg" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-semibold tracking-tight">
-                Closest right now · {closest.distance}m
-              </p>
-              <p className="truncate text-xs text-muted-foreground">{closest.place}</p>
-            </div>
+      <section className="mt-8 px-6">
+        <button
+          type="button"
+          onClick={() => setBuzzing(closest)}
+          className="flex w-full items-center gap-3 text-left"
+        >
+          <Avatar
+            name={closest.name}
+            src={closest.photo}
+            hue={closest.hue}
+            className="h-11 w-11"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[14px] font-semibold tracking-tight text-ink">
+              {closest.name}
+            </p>
+            <p className="truncate text-[12px] text-muted-foreground">
+              Closest · {closest.distance}m · {closest.place}
+            </p>
           </div>
-          <button
-            onClick={() => setBuzzing(closest)}
-            className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-[1.15rem] gradient-warm text-[15px] font-semibold text-primary-foreground shadow-float transition-transform active:scale-[0.98]"
-          >
-            <Vibrate className="h-[18px] w-[18px]" /> Simulate a buzz
-          </button>
-          <p className="mt-2.5 text-center text-[11px] text-muted-foreground">
-            In real life this fires on its own when you're within 50m.
-          </p>
-        </div>
-
-        <div className="mt-3 flex items-start gap-3 rounded-[1.4rem] bg-accent/55 p-4">
-          <Waves className="mt-0.5 h-4 w-4 shrink-0 text-accent-foreground" />
-          <p className="text-[12px] leading-relaxed text-accent-foreground">
-            Orbit never shows anyone a map of you. Only distance, only while you're both out, only in the
-            moment you cross paths.
-          </p>
-        </div>
+        </button>
+        <p className="mt-4 text-center text-[12px] text-muted-foreground">
+          Location stays on your phone. Only distance is shared.
+        </p>
       </section>
-
 
       {buzzing && <BuzzSheet person={buzzing} onClose={() => setBuzzing(null)} />}
     </PhoneFrame>

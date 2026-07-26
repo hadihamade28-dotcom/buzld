@@ -32,6 +32,12 @@ export function playMatchBuzz(seed: string): void {
   Vibration.vibrate(pattern);
 }
 
+/** Short tick for onboarding auto-advance momentum. */
+export function playTick(): void {
+  if (Platform.OS === 'web') return;
+  Vibration.vibrate(12);
+}
+
 export function cancelBuzz(): void {
   Vibration.cancel();
 }

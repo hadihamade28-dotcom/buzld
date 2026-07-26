@@ -13,14 +13,18 @@ export function isStoragePath(value: string) {
 }
 
 /** Upload a local image URI to the private photos bucket. Returns the storage path. */
-export async function uploadProfilePhoto(userId: string, localUri: string): Promise<string> {
+export async function uploadProfilePhoto(
+  userId: string,
+  localUri: string,
+  slot = 0,
+): Promise<string> {
   const client = requireClient();
   const response = await fetch(localUri);
   const blob = await response.blob();
   const ext = localUri.split('.').pop()?.split('?')[0]?.toLowerCase() || 'jpg';
   const contentType =
     ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
-  const path = `${userId}/primary-${Date.now()}.${ext}`;
+  const path = `${userId}/photo-${slot}-${Date.now()}.${ext}`;
 
   const { error } = await client.storage.from('photos').upload(path, blob, {
     contentType,

@@ -16,7 +16,11 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Vicino needs background location while discovery is on so nearby matches can find you.",
         "NSBluetoothAlwaysUsageDescription": "Vicino uses Bluetooth to confirm when a match is physically close.",
         "NSBluetoothPeripheralUsageDescription": "Vicino broadcasts a short-lived token so nearby matches can find each other.",
-        "UIBackgroundModes": ["location", "bluetooth-central", "bluetooth-peripheral"]
+        "UIBackgroundModes": [
+          "location",
+          "bluetooth-central",
+          "bluetooth-peripheral"
+        ]
       }
     },
     "android": {
@@ -67,7 +71,10 @@
         "react-native-ble-plx",
         {
           "isBackgroundEnabled": true,
-          "modes": ["peripheral", "central"],
+          "modes": [
+            "peripheral",
+            "central"
+          ],
           "bluetoothAlwaysPermission": "Allow Vicino to use Bluetooth to confirm nearby matches."
         }
       ],
@@ -78,7 +85,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#FFF5F7"
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

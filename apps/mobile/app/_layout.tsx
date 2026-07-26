@@ -19,6 +19,7 @@ import { ConfigRequired } from '@/components/ConfigRequired';
 import { MobileShell } from '@/components/MobileShell';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { colors } from '@/constants/theme';
+import { stepRoute } from '@/lib/onboarding';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 if (Platform.OS !== 'web') {
@@ -42,7 +43,11 @@ function RootNavigator() {
     }
 
     if (userId && profile && !profile.onboarding_complete && !inOnboarding) {
-      router.replace('/(onboarding)/welcome');
+      if (profile.onboarding_step && profile.onboarding_step !== 'done') {
+        router.replace(stepRoute(profile.onboarding_step));
+      } else {
+        router.replace('/(onboarding)/welcome');
+      }
       return;
     }
 

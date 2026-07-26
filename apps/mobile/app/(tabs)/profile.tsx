@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppScreen } from '@/components/FlowShell';
 import { PhotoImage } from '@/components/PhotoImage';
+import { ProfileBoostPrompt } from '@/components/ProfileBoostPrompt';
 import { Button, Chip, PromptCard, SectionLabel, SettingsRow, SwitchRow } from '@/components/ui';
 import { colors, fonts, gradients, layout, radii, shadows, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
@@ -54,6 +55,10 @@ export default function ProfileScreen() {
           <View style={styles.handle} />
           <Text style={styles.title}>My profile</Text>
           <Text style={styles.subtitle}>How others see you nearby</Text>
+
+          <View style={{ marginHorizontal: -spacing.lg }}>
+            <ProfileBoostPrompt />
+          </View>
 
           {profile?.bio ? <PromptCard prompt="About me" answer={profile.bio} /> : null}
 

@@ -23,6 +23,9 @@ export default function EditInterestsScreen() {
     setBusy(true);
     try {
       await api.setInterests(selected);
+      if (selected.length >= 3) {
+        await api.clearProfileGap('interests').catch(() => undefined);
+      }
       await refresh();
       router.back();
     } finally {

@@ -7,14 +7,14 @@ import { AuthField, SocialRow } from "@/components/AuthField";
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Create your account — Orbit" },
+      { title: "Create your account — Buzld" },
       {
         name: "description",
         content:
-          "Set up Orbit in a minute: your name, your buzz radius, and you're ready to match with people you actually cross paths with.",
+          "Set up Buzld in a minute: your name, your buzz radius, and you're ready to match with people you actually cross paths with.",
       },
-      { property: "og:title", content: "Create your account — Orbit" },
-      { property: "og:description", content: "Join Orbit and start matching by proximity, not swiping." },
+      { property: "og:title", content: "Create your account — Buzld" },
+      { property: "og:description", content: "Join Buzld and start matching by proximity, not swiping." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -53,7 +53,7 @@ function SignUp() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {step === 0
-            ? "Orbit only needs the basics. No bio marathon, no swiping."
+            ? "Buzld only needs the basics. No bio marathon, no swiping."
             : "This is what appears for a moment when your phones buzz."}
         </p>
       </header>
@@ -89,7 +89,7 @@ function SignUp() {
               {agreed ? <Check className="h-3.5 w-3.5" /> : null}
             </span>
             <span className="text-[12px] leading-relaxed text-muted-foreground">
-              I'm 18 or older and I agree to Orbit's terms and privacy policy, including sharing approximate proximity
+              I'm 18 or older and I agree to Buzld's terms and privacy policy, including sharing approximate proximity
               while the app is on.
             </span>
           </button>
@@ -119,24 +119,6 @@ function SignUp() {
             hint="Shown with your photo when you cross someone's path."
           />
 
-          <div className="rounded-3xl border border-border/70 bg-surface p-4">
-            <p className="text-sm font-semibold">Your photos</p>
-            <p className="mt-1 text-[12px] text-muted-foreground">
-              Add up to three. These only appear to someone once you're actually near each other.
-            </p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="flex aspect-[3/4] items-center justify-center rounded-2xl border border-dashed border-border text-2xl font-light text-muted-foreground"
-                >
-                  +
-                </button>
-              ))}
-            </div>
-          </div>
-
           <button
             type="submit"
             className="w-full rounded-2xl bg-primary py-4 text-sm font-semibold text-primary-foreground shadow-soft transition-transform active:scale-[0.98]"
@@ -149,7 +131,7 @@ function SignUp() {
       {step === 0 ? <SocialRow /> : null}
 
       <p className="mt-8 px-6 text-center text-sm text-muted-foreground">
-        Already have Orbit?{" "}
+        Already have Buzld?{" "}
         <Link to="/signin" className="font-semibold text-primary">
           Sign in
         </Link>

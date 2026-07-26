@@ -14,7 +14,9 @@ import { Route as EncountersRouteImport } from './routes/encounters'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as NearbyRouteImport } from './routes/nearby'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -45,9 +47,19 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreferencesRoute = PreferencesRouteImport.update({
+  id: '/preferences',
+  path: '/preferences',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SigninRoute = SigninRouteImport.update({
@@ -77,7 +89,9 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRoute
   '/nearby': typeof NearbyRoute
   '/onboarding': typeof OnboardingRoute
+  '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -89,7 +103,9 @@ export interface FileRoutesByTo {
   '/matches': typeof MatchesRoute
   '/nearby': typeof NearbyRoute
   '/onboarding': typeof OnboardingRoute
+  '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -102,7 +118,9 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRoute
   '/nearby': typeof NearbyRoute
   '/onboarding': typeof OnboardingRoute
+  '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -116,7 +134,9 @@ export interface FileRouteTypes {
     | '/matches'
     | '/nearby'
     | '/onboarding'
+    | '/preferences'
     | '/profile'
+    | '/settings'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -128,7 +148,9 @@ export interface FileRouteTypes {
     | '/matches'
     | '/nearby'
     | '/onboarding'
+    | '/preferences'
     | '/profile'
+    | '/settings'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -140,7 +162,9 @@ export interface FileRouteTypes {
     | '/matches'
     | '/nearby'
     | '/onboarding'
+    | '/preferences'
     | '/profile'
+    | '/settings'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -153,7 +177,9 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRoute
   NearbyRoute: typeof NearbyRoute
   OnboardingRoute: typeof OnboardingRoute
+  PreferencesRoute: typeof PreferencesRoute
   ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -197,11 +223,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preferences': {
+      id: '/preferences'
+      path: '/preferences'
+      fullPath: '/preferences'
+      preLoaderRoute: typeof PreferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signin': {
@@ -241,7 +281,9 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRoute,
   NearbyRoute: NearbyRoute,
   OnboardingRoute: OnboardingRoute,
+  PreferencesRoute: PreferencesRoute,
   ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

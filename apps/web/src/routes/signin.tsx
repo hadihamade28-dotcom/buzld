@@ -7,12 +7,12 @@ import { AuthField, SocialRow } from "@/components/AuthField";
 export const Route = createFileRoute("/signin")({
   head: () => ({
     meta: [
-      { title: "Sign in — Orbit" },
+      { title: "Sign in — Buzld" },
       {
         name: "description",
-        content: "Sign in to Orbit and pick up where you left off with the people you crossed paths with.",
+        content: "Sign in to Buzld and pick up where you left off with the people you crossed paths with.",
       },
-      { property: "og:title", content: "Sign in — Orbit" },
+      { property: "og:title", content: "Sign in — Buzld" },
       { property: "og:description", content: "Welcome back to proximity-first dating." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -86,7 +86,7 @@ function SignIn() {
       <SocialRow />
 
       <p className="mt-8 px-6 text-center text-sm text-muted-foreground">
-        New to Orbit?{" "}
+        New to Buzld?{" "}
         <Link to="/signup" className="font-semibold text-primary">
           Create an account
         </Link>

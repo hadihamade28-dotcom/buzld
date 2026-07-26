@@ -35,65 +35,65 @@
   --color-ring-offset-background: var(--background);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --radius: 1.25rem;
+  --radius: 1rem;
 
-  --background: oklch(0.985 0.008 70);
-  --foreground: oklch(0.22 0.03 30);
+  --background: oklch(0.992 0.004 220);
+  --foreground: oklch(0.2 0.02 255);
   --surface: oklch(1 0 0);
-  --ink: oklch(0.18 0.025 30);
+  --ink: oklch(0.16 0.025 255);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 30);
+  --card-foreground: oklch(0.2 0.02 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 30);
+  --popover-foreground: oklch(0.2 0.02 255);
 
-  --primary: oklch(0.65 0.19 25);
-  --primary-foreground: oklch(0.99 0.005 60);
-  --primary-glow: oklch(0.76 0.16 55);
+  --primary: oklch(0.58 0.13 195);
+  --primary-foreground: oklch(0.99 0.01 200);
+  --primary-glow: oklch(0.72 0.11 180);
 
-  --secondary: oklch(0.955 0.015 60);
-  --secondary-foreground: oklch(0.3 0.04 30);
-  --muted: oklch(0.96 0.012 65);
-  --muted-foreground: oklch(0.55 0.03 40);
-  --accent: oklch(0.93 0.05 70);
-  --accent-foreground: oklch(0.28 0.05 30);
+  --secondary: oklch(0.96 0.01 230);
+  --secondary-foreground: oklch(0.28 0.03 255);
+  --muted: oklch(0.965 0.008 230);
+  --muted-foreground: oklch(0.52 0.02 250);
+  --accent: oklch(0.95 0.025 195);
+  --accent-foreground: oklch(0.28 0.04 210);
 
-  --destructive: oklch(0.58 0.22 25);
+  --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.99 0.005 60);
 
-  --border: oklch(0.91 0.012 60);
-  --input: oklch(0.91 0.012 60);
-  --ring: oklch(0.65 0.19 25);
+  --border: oklch(0.91 0.01 240);
+  --input: oklch(0.91 0.01 240);
+  --ring: oklch(0.58 0.13 195);
 
   --gradient-warm: linear-gradient(135deg, var(--primary), var(--primary-glow));
-  --gradient-dusk: linear-gradient(160deg, oklch(0.28 0.06 30), oklch(0.4 0.13 20));
-  --shadow-soft: 0 1px 2px oklch(0.3 0.05 30 / 5%), 0 10px 28px -14px oklch(0.4 0.08 30 / 22%);
-  --shadow-lift: 0 24px 60px -20px oklch(0.45 0.14 25 / 30%);
-  --shadow-float: 0 2px 6px oklch(0.3 0.05 30 / 6%), 0 18px 44px -18px oklch(0.4 0.1 30 / 34%);
-  --shadow-device: 0 60px 120px -40px oklch(0.35 0.09 30 / 45%), 0 0 0 1px oklch(0.3 0.04 30 / 8%);
+  --gradient-dusk: linear-gradient(160deg, oklch(0.22 0.04 250), oklch(0.35 0.08 210));
+  --shadow-soft: 0 1px 2px oklch(0.3 0.04 250 / 4%), 0 10px 28px -14px oklch(0.4 0.05 250 / 16%);
+  --shadow-lift: 0 24px 60px -20px oklch(0.4 0.08 210 / 28%);
+  --shadow-float: 0 2px 6px oklch(0.3 0.04 250 / 5%), 0 18px 44px -18px oklch(0.4 0.08 210 / 28%);
+  --shadow-device: 0 60px 120px -40px oklch(0.35 0.05 250 / 40%), 0 0 0 1px oklch(0.3 0.03 250 / 8%);
 }
 
 
 .dark {
-  --background: oklch(0.18 0.02 30);
-  --foreground: oklch(0.97 0.008 60);
-  --surface: oklch(0.23 0.025 30);
-  --ink: oklch(0.97 0.008 60);
-  --card: oklch(0.23 0.025 30);
-  --card-foreground: oklch(0.97 0.008 60);
-  --popover: oklch(0.23 0.025 30);
-  --popover-foreground: oklch(0.97 0.008 60);
-  --secondary: oklch(0.27 0.03 30);
-  --secondary-foreground: oklch(0.97 0.008 60);
-  --muted: oklch(0.27 0.03 30);
-  --muted-foreground: oklch(0.72 0.02 50);
-  --accent: oklch(0.32 0.05 35);
-  --accent-foreground: oklch(0.97 0.008 60);
+  --background: oklch(0.17 0.02 255);
+  --foreground: oklch(0.97 0.008 220);
+  --surface: oklch(0.22 0.025 255);
+  --ink: oklch(0.97 0.008 220);
+  --card: oklch(0.22 0.025 255);
+  --card-foreground: oklch(0.97 0.008 220);
+  --popover: oklch(0.22 0.025 255);
+  --popover-foreground: oklch(0.97 0.008 220);
+  --secondary: oklch(0.26 0.03 250);
+  --secondary-foreground: oklch(0.97 0.008 220);
+  --muted: oklch(0.26 0.03 250);
+  --muted-foreground: oklch(0.7 0.02 230);
+  --accent: oklch(0.3 0.05 200);
+  --accent-foreground: oklch(0.97 0.008 220);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
 }
@@ -146,11 +146,11 @@
 }
 
 @utility bg-app-ambient {
-  background-color: oklch(0.965 0.012 65);
+  background-color: oklch(0.94 0.012 230);
   background-image:
-    radial-gradient(circle at 12% -8%, oklch(0.88 0.1 35 / 70%), transparent 45%),
-    radial-gradient(circle at 92% 6%, oklch(0.9 0.08 20 / 65%), transparent 42%),
-    radial-gradient(circle at 50% 112%, oklch(0.92 0.07 60 / 70%), transparent 48%);
+    radial-gradient(circle at 10% -10%, oklch(0.9 0.06 195 / 55%), transparent 42%),
+    radial-gradient(circle at 95% 8%, oklch(0.9 0.04 250 / 45%), transparent 40%),
+    radial-gradient(circle at 50% 110%, oklch(0.92 0.05 180 / 50%), transparent 48%);
 }
 
 @utility device-shell {
@@ -189,12 +189,33 @@
 
 @keyframes radar-pulse {
   0% {
-    transform: scale(0.35);
-    opacity: 0.55;
+    transform: scale(0.2);
+    opacity: 0.45;
+  }
+  70% {
+    opacity: 0.12;
   }
   100% {
-    transform: scale(1.6);
+    transform: scale(1);
     opacity: 0;
+  }
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-counter {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
   }
 }
 
@@ -220,11 +241,11 @@
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -234,12 +255,20 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
 }
 
 @utility animate-radar {
-  animation: radar-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  animation: radar-pulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+@utility animate-orbit {
+  animation: orbit-spin var(--orbit-duration, 28s) linear infinite;
+}
+
+@utility animate-orbit-item {
+  animation: orbit-counter var(--orbit-duration, 28s) linear infinite;
 }
 
 @utility animate-buzz {
@@ -247,7 +276,7 @@
 }
 
 @utility animate-rise {
-  animation: rise-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: rise-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @utility animate-float {

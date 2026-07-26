@@ -1,32 +1,61 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { SkipLink } from '@/components/OnboardingChoices';
 import { FlowShell } from '@/components/FlowShell';
 import { Body, Button, Chip, OnboardingProgress, Title } from '@/components/ui';
 import { colors, fonts, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { playTick } from '@/lib/haptics';
+import { AUTO_ADVANCE_MS, progressFor } from '@/lib/onboarding';
 import { INTEREST_CATALOG } from '@/lib/types';
 
-export default function InterestsOnboarding() {
+export default function InterestsScreen() {
   const { interests: existing, refresh } = useAuth();
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>(existing);
   const [busy, setBusy] = useState(false);
+  const progress = progressFor('interests');
+
+  useEffect(() => {
+    api.logOnboardingEvent('interests', 'view').catch(() => undefined);
+  }, []);
 
   const toggle = (tag: string) => {
-    setSelected((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
+    setSelected((prev) => {
+      if (prev.includes(tag)) return prev.filter((t) => t !== tag);
+      if (prev.length >= 10) return prev;
+      return [...prev, tag];
+    });
+  };
+
+  const goNext = () => {
+    playTick();
+    setTimeout(() => router.push('/(onboarding)/lifestyle'), AUTO_ADVANCE_MS);
   };
 
   const next = async () => {
+    if (selected.length < 3) return;
     setBusy(true);
     try {
       await api.setInterests(selected);
+      await api.advanceOnboarding('lifestyle', {});
+      await api.clearProfileGap('interests').catch(() => undefined);
       await refresh();
-      router.push('/(onboarding)/prefs');
+      goNext();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const skip = async () => {
+    setBusy(true);
+    try {
+      await api.skipOnboardingGap('lifestyle', 'interests');
+      await refresh();
+      goNext();
     } finally {
       setBusy(false);
     }
@@ -34,8 +63,8 @@ export default function InterestsOnboarding() {
 
   return (
     <FlowShell
-      headerHeight={140}
-      header={<OnboardingProgress step={2} total={3} />}
+      headerHeight={120}
+      header={<OnboardingProgress step={progress.step} total={progress.total} />}
       footer={
         <View style={styles.footer}>
           <Button
@@ -45,45 +74,37 @@ export default function InterestsOnboarding() {
             disabled={selected.length < 3}
             large
           />
+          <SkipLink onPress={skip} />
         </View>
       }
     >
-      <Title>Pick your interests</Title>
-      <Body style={{ marginTop: spacing.xs, marginBottom: spacing.lg }}>
-        Choose at least 3 — we use these to find people you will click with.
-      </Body>
-
+      <Title>Interests</Title>
+      <Body style={styles.body}>Tap 3–10. We’ll use these to find people you click with.</Body>
       <View style={styles.chipRow}>
         {INTEREST_CATALOG.map((tag) => (
           <Chip key={tag} label={tag} active={selected.includes(tag)} onPress={() => toggle(tag)} />
         ))}
       </View>
-
-      <View style={styles.counterWrap}>
-        <Text style={[styles.counter, selected.length >= 3 && styles.counterDone]}>
-          {selected.length}/3 minimum {selected.length >= 3 ? '✓' : ''}
-        </Text>
-      </View>
+      <Text style={styles.counter}>{selected.length} selected</Text>
     </FlowShell>
   );
 }
 
 const styles = StyleSheet.create({
+  body: { marginTop: spacing.xs, marginBottom: spacing.lg, color: colors.textSecondary },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  counterWrap: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
-    backgroundColor: colors.bg,
-    paddingVertical: 12,
-    borderRadius: 999,
+  counter: {
+    marginTop: spacing.md,
+    textAlign: 'center',
+    fontFamily: fonts.bodyMedium,
+    color: colors.textSecondary,
   },
-  counter: { fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14 },
-  counterDone: { color: colors.rose, fontFamily: fonts.bodyBold },
   footer: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+    gap: spacing.xs,
   },
 });

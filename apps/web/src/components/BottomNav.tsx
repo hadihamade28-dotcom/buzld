@@ -14,7 +14,7 @@ export function BottomNav() {
 
   return (
     <nav className="pointer-events-none absolute inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-      <ul className="glass pointer-events-auto flex items-stretch gap-1 rounded-[1.65rem] p-1.5 shadow-float">
+      <ul className="pointer-events-auto flex items-stretch gap-1 rounded-full border border-border/60 bg-surface/90 p-1.5 shadow-soft backdrop-blur-xl">
         {items.map(({ to, label, icon: Icon }) => {
           const active = pathname.startsWith(to);
           return (
@@ -22,13 +22,13 @@ export function BottomNav() {
               <Link
                 to={to}
                 className={cn(
-                  "relative flex flex-col items-center gap-[3px] rounded-[1.3rem] px-1 py-2 text-[10.5px] font-semibold tracking-tight transition-all duration-300",
+                  "relative flex flex-col items-center gap-[3px] rounded-full px-1 py-2 text-[10.5px] font-semibold tracking-tight transition-colors duration-200",
                   active
-                    ? "gradient-warm text-primary-foreground shadow-soft"
-                    : "text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground",
+                    ? "bg-ink text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.5 : 1.9} />
+                <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.4 : 1.9} />
                 {label}
               </Link>
             </li>

@@ -6,6 +6,9 @@ import { BottomNav } from "./BottomNav";
  * App shell. On a real phone this is edge-to-edge and exactly one viewport tall
  * (the content column scrolls, the page never does). On desktop the same column
  * is centred inside a device-style frame.
+ *
+ * Pass `overflow-hidden` via className to lock a screen to the viewport
+ * (e.g. onboarding) so inner layouts can fit without scrolling.
  */
 export function PhoneFrame({
   children,
@@ -24,8 +27,9 @@ export function PhoneFrame({
 
         <main
           className={cn(
-            "no-scrollbar relative flex-1 overflow-y-auto overscroll-contain",
+            "no-scrollbar relative flex min-h-0 flex-1 flex-col overscroll-contain",
             hideNav ? "pb-[max(1.25rem,env(safe-area-inset-bottom))]" : "pb-28",
+            "overflow-y-auto",
             className,
           )}
         >
